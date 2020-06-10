@@ -15,4 +15,14 @@ const router = new VueRouter({
   routes
 })
 
+// mount router navigation protector
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    return next();
+  }
+  const tokenStr = window.sessionStorage.getItem('token');
+  if (!tokenStr) return next('/login');
+  next();
+})
+
 export default router

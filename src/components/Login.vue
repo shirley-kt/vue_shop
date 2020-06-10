@@ -44,8 +44,8 @@ export default {
     return {
       // log in data model
       loginForm: {
-        username: "admin",
-        password: "123456"
+        username: 'admin',
+        password: '123456'
       },
       // form check rules
       loginFormRules: {
@@ -53,50 +53,50 @@ export default {
         username: [
           {
             required: true,
-            message: "Username is required",
-            trigger: "blur"
+            message: 'Username is required',
+            trigger: 'blur'
           },
           {
             min: 3,
             max: 10,
-            message: "Username is betwwen 3 and 10 characters",
-            trigger: "blur"
+            message: 'Username is betwwen 3 and 10 characters',
+            trigger: 'blur'
           }
         ],
         // check if password is valid
         password: [
           {
             required: true,
-            message: "Password is required",
-            trigger: "blur"
+            message: 'Password is required',
+            trigger: 'blur'
           },
           {
             min: 6,
             max: 15,
-            message: "Password is betwwen 6 and 15 characters",
-            trigger: "blur"
+            message: 'Password is betwwen 6 and 15 characters',
+            trigger: 'blur'
           }
         ]
       }
-    };
+    }
   },
   methods: {
     resetLoginForm() {
-      this.$refs.loginFormRef.resetFields();
+      this.$refs.loginFormRef.resetFields()
     },
     login() {
       this.$refs.loginFormRef.validate(async valid => {
-        if (!valid) return;
-        const { data: res } = await this.$http.post("login", this.loginForm);
-        if (res.meta.status != 200) return this.$message.error("Log in fail");
-        this.$message.success("Log in success");
-        window.sessionStorage.setItem("token", res.data.token);
+        if (!valid) return
+        const { data: res } = await this.$http.post('login', this.loginForm)
+        if (res.meta.status != 200) return this.$message.error('Log in fail')
+        this.$message.success('Log in success')
+        window.sessionStorage.setItem('token', res.data.token)
         // Programtic Direct
-        this.$router.push("/home");
-      });
+        this.$router.push('/home')
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
