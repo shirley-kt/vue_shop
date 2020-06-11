@@ -7,7 +7,6 @@ import './assets/css/global.css'
 
 // font
 import './assets/fonts/iconfont.css'
-import './assets/icofont/icofont.css'
 
 // Element UI
 import './plugins/element.js'
@@ -17,6 +16,14 @@ import axios from 'axios'
 
 // Request base url
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+
+// Add authorization(token)
+axios.interceptors.request.use(config => {
+  config.headers.Authorization = window.sessionStorage.getItem('token');
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
 
 Vue.prototype.$http = axios
 

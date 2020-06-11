@@ -29,8 +29,8 @@
         </el-form-item>
         <!-- button -->
         <el-form-item class="btns">
-          <el-button type="primary" @click="login()">Login</el-button>
-          <el-button type="info" @click="resetLoginForm()">Reset</el-button>
+          <el-button class="login-button" type="primary" @click="login()">Login</el-button>
+          <el-button class="reset-button" type="info" @click="resetLoginForm()">Reset</el-button>
         </el-form-item>
       </el-form>
       <!-- login end -->
@@ -102,7 +102,7 @@ export default {
 <style lang="less" scoped>
 .login_container {
   height: 100%;
-  background-color: #2b4b6b;
+  background-color: #ededee;
 }
 
 .login_box {
@@ -146,5 +146,13 @@ export default {
   width: 100%;
   padding: 0px 20px;
   box-sizing: border-box;
+}
+
+.login-button {
+  background-color: #fb5020;
+}
+
+.reset-button {
+  background-color: #212121;
 }
 </style>
