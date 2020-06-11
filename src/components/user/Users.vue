@@ -49,7 +49,12 @@
         <el-table-column label="Action" width="180px">
           <template slot-scope="scope">
             <!-- edit -->
-            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showEditDialog(scope.row.id)"
+            ></el-button>
             <!-- delete -->
             <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
             <!-- assign role -->
@@ -101,6 +106,26 @@
       </span>
     </el-dialog>
     <!-- Add User dialog end-->
+
+    <!-- edit user dialog start-->
+    <el-dialog title="提示" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
+      <el-form :model="editFrom" :rules="editFromRules" ref="editFromRef" label-width="100px">
+        <el-form-item label="Username">
+          <el-input v-model="editFrom.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Email" prop="email">
+          <el-input v-model="editFrom.email"></el-input>
+        </el-form-item>
+        <el-form-item label="Mobile" prop="mobile">
+          <el-input v-model="editFrom.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="editUserInfo">Edit User</el-button>
+      </span>
+    </el-dialog>
+    <!-- edit user dialog end-->
   </div>
 </template>
 
@@ -196,7 +221,38 @@ export default {
             trigger: 'blur'
           }
         ]
-      }
+      },
+      // control edit dialog
+      editDialogVisible: false,
+      // fetched user info object
+      editFrom: {},
+      // edit form validators
+      editFromRules: [
+        {
+          email: [
+            {
+              required: true,
+              message: 'Please input your email',
+              trigger: 'blur'
+            },
+            {
+              validator: checkEmail,
+              trigger: 'blur'
+            }
+          ],
+          mobile: [
+            {
+              required: true,
+              message: 'Please input your mobile',
+              trigger: 'blur'
+            },
+            {
+              validator: checkMobile,
+              trigger: 'blur'
+            }
+          ]
+        }
+      ]
     }
   },
   created() {
@@ -252,6 +308,42 @@ export default {
         this.addDialogVisible = false
         // gain user list
         this.getUserList()
+      })
+    },
+    // edit user
+    async showEditDialog(id) {
+      const { data, res } = await this.$http.get('/users/' + id)
+      if (res.meta.status !== 200) {
+        return this.$message.error('Fetch User info failed')
+      }
+      this.editFrom = res.data
+      this.editDialogVisible = true
+    },
+    // listen to edit user dialog close event
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+    },
+    // edit user info and submit
+    editUserInfo() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) {
+          return
+        }
+        const { data: res } = await this.$http.put(
+          'users/' + this.editFrom.id,
+          {
+            email: this.editFrom.email,
+            mobile: this.editFrom.mobile
+          }
+        )
+
+        if (res.meta.status !== 200) {
+          this.$message.error('Failed update user info')
+        }
+
+        this.editDialogVisible = false
+        this.getUserList
+        this.$message.success('Success update user info')
       })
     }
   }
