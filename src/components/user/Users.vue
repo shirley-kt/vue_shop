@@ -56,7 +56,12 @@
               @click="showEditDialog(scope.row.id)"
             ></el-button>
             <!-- delete -->
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="removeUserById(scope.row.id)"
+            ></el-button>
             <!-- assign role -->
             <el-tooltip effect="dark" content="Assign roles" placement="top" :enterable="false">
               <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
@@ -109,7 +114,7 @@
 
     <!-- edit user dialog start-->
     <el-dialog title="提示" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
-      <el-form :model="editFrom" :rules="editFromRules" ref="editFromRef" label-width="100px">
+      <el-form :model="editFrom" :rules="editFormRules" ref="editFormRef" label-width="100px">
         <el-form-item label="Username">
           <el-input v-model="editFrom.username" disabled></el-input>
         </el-form-item>
@@ -227,32 +232,30 @@ export default {
       // fetched user info object
       editFrom: {},
       // edit form validators
-      editFromRules: [
-        {
-          email: [
-            {
-              required: true,
-              message: 'Please input your email',
-              trigger: 'blur'
-            },
-            {
-              validator: checkEmail,
-              trigger: 'blur'
-            }
-          ],
-          mobile: [
-            {
-              required: true,
-              message: 'Please input your mobile',
-              trigger: 'blur'
-            },
-            {
-              validator: checkMobile,
-              trigger: 'blur'
-            }
-          ]
-        }
-      ]
+      editFormRules: {
+        email: [
+          {
+            required: true,
+            message: 'Please input your email',
+            trigger: 'blur'
+          },
+          {
+            validator: checkEmail,
+            trigger: 'blur'
+          }
+        ],
+        mobile: [
+          {
+            required: true,
+            message: 'Please input your mobile',
+            trigger: 'blur'
+          },
+          {
+            validator: checkMobile,
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   created() {
@@ -312,7 +315,7 @@ export default {
     },
     // edit user
     async showEditDialog(id) {
-      const { data, res } = await this.$http.get('/users/' + id)
+      const { data: res } = await this.$http.get('users/' + id)
       if (res.meta.status !== 200) {
         return this.$message.error('Fetch User info failed')
       }
@@ -345,6 +348,32 @@ export default {
         this.getUserList
         this.$message.success('Success update user info')
       })
+    },
+    // remove user by id
+    async removeUserById(id) {
+      // confirm deletion
+      const confirmResult = await this.$confirm(
+        'Do you confirm to delete the user?',
+        'Confirm',
+        {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      ).catch(err => err) // if user canceled, need to catch error
+
+      // if user confirmed, returned a "confirm"
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('Deletion Canceled')
+      }
+
+      // request to delete user
+      const { data: res } = await this.$http.delete('users/' + id)
+      if (res.meta.status !== 200) {
+        return this.$message.error('Deletion failed')
+      }
+      this.$message.message('Deletion succeed')
+      this.getUserList()
     }
   }
 }
