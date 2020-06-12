@@ -64,7 +64,12 @@
             ></el-button>
             <!-- assign role -->
             <el-tooltip effect="dark" content="Assign roles" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+                @click="setRole(scope.row)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -113,7 +118,12 @@
     <!-- Add User dialog end-->
 
     <!-- edit user dialog start-->
-    <el-dialog title="提示" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
+    <el-dialog
+      title="Edit User"
+      :visible.sync="editDialogVisible"
+      width="30%"
+      @close="editDialogClosed"
+    >
       <el-form :model="editFrom" :rules="editFormRules" ref="editFormRef" label-width="100px">
         <el-form-item label="Username">
           <el-input v-model="editFrom.username" disabled></el-input>
@@ -131,6 +141,41 @@
       </span>
     </el-dialog>
     <!-- edit user dialog end-->
+
+    <!-- Assign role start -->
+    <el-dialog
+      title="Assign Roles"
+      :visible.sync="setRoleDialogVisible"
+      width="50%"
+      @close="setRoleDialogClosed"
+    >
+      <div class="assign-role-dialog">
+        <p>
+          Current Username:
+          <span>{{userInfo.username}}</span>
+        </p>
+        <p>
+          Current Role:
+          <span>{{userInfo.role_name}}</span>
+        </p>
+        <p>
+          Assign New Role:
+          <el-select v-model="selectedRoleId" placeholder="Please Select">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="saveRoleInfo" class="confirm-button">Confirm</el-button>
+      </span>
+    </el-dialog>
+    <!-- Assign role end -->
   </div>
 </template>
 
@@ -255,7 +300,14 @@ export default {
             trigger: 'blur'
           }
         ]
-      }
+      },
+      // set role diablog visibility
+      setRoleDialogVisible: false,
+      // User role info that will be assigned roles
+      userInfo: {},
+      // all roles list
+      rolesList: [],
+      selectedRoleId: ''
     }
   },
   created() {
@@ -374,13 +426,62 @@ export default {
       }
       this.$message.message('Deletion succeed')
       this.getUserList()
+    },
+    // show assign role dialog
+    async setRole(userInfo) {
+      this.userInfo = userInfo
+      // get list of all role list
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200)
+        return this.$message.error('Get roles failed')
+      this.rolesList = res.data
+      this.setRoleDialogVisible = true
+    },
+    // save assigned Role
+    async saveRoleInfo() {
+      if (!this.selectedRoleId) {
+        return this.$message.info('Please select a role')
+      }
+
+      const { data: res } = await this.$http.put(
+        `users/${this.userInfo.id}/role`,
+        {
+          rid: this.selectedRoleId
+        }
+      )
+      console.log(res)
+      if (res.meta.status !== 200) {
+        return this.$message.error('Failed to assign role')
+      }
+      this.$message.success('Assigned role succeed')
+      this.getUserList()
+      this.setRoleDialogVisible = false
+    },
+    // listen assign role dialog close
+    setRoleDialogClosed() {
+      ;(this.userInfo = {}), (this.selectedRoleId = '')
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.search-button {
+.search-button,
+.confirm-button {
   background-color: #fb5020;
+  border-color: #fb5020;
+}
+
+.assign-role-dialog {
+  font-size: 15px;
+}
+
+.assign-role-dialog p {
+  padding: 8px 8px;
+}
+
+.assign-role-dialog p span {
+  margin-left: 5px;
+  color: #fb5020;
 }
 </style>

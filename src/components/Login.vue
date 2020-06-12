@@ -150,6 +150,7 @@ export default {
 
 .login-button {
   background-color: #fb5020;
+  border-color: #fb5020;
 }
 
 .reset-button {
