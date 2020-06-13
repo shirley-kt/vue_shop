@@ -31,7 +31,7 @@
       <!-- search and add end-->
 
       <!-- user list -->
-      <el-table :data="userlist" border stripe>
+      <el-table :data="userlist" border stripe empty-text="No Data">
         <el-table-column type="index"></el-table-column>
         <el-table-column label="Name" prop="username"></el-table-column>
         <el-table-column label="Email" prop="email"></el-table-column>

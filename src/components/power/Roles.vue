@@ -21,7 +21,7 @@
       <!-- add role button end -->
 
       <!-- role list start -->
-      <el-table :data="rolelist" border stripe>
+      <el-table :data="rolelist" border stripe empty-text="No Data">
         <el-table-column type="expand">
           <template slot-scope="scope">
             <el-row

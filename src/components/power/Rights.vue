@@ -12,7 +12,7 @@
 
     <!-- card start -->
     <el-card>
-      <el-table :data="rightsList" border stripe>
+      <el-table :data="rightsList" border stripe empty-text="No Data">
         <el-table-column type="index"></el-table-column>
         <el-table-column label="Role Name" prop="authName"></el-table-column>
         <el-table-column label="Path" prop="path"></el-table-column>
